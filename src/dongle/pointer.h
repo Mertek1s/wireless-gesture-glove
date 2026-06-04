@@ -35,3 +35,18 @@ bool pointerCalibrated();
 // (heading, left/right) and eulerY (roll, up/down); eulerZ is unused as it
 // barely moves while pointing.
 ScreenPos pointerUpdate(float yaw, float roll);
+
+// Slow / precision-zoom mode. When enabled the cursor anchors at its current
+// position and hand motion then covers only a fraction of the screen around
+// it, so the same hand sweep gives finer control. Toggling it on does not move
+// the cursor, toggling it off snaps back to the true pointed-at position. The
+// call is idempotent so it is safe to push the current state every packet
+void pointerSetPrecision(bool on);
+
+// true while precision mode is active.
+bool pointerPrecision();
+
+// Forgets the smoothing filter so the next pointerUpdate() jumps straight to
+// the live orientation instead of slewing toward it. Call when resuming from
+// sleep so the cursor snaps to where the hand now points.
+void pointerResetFilter();

@@ -3,7 +3,7 @@
  *
  * Reads the three fingertip-to-thumb contacts, debounces them and
  * classifies each as a tap or a hold. The glove uses this to sense the
- * finger gestures: clicks, DPI cycling and tracking sleep.
+ * finger gestures: clicks, the DPI toggle and tracking sleep.
  */
 #pragma once
 
@@ -11,7 +11,7 @@
 enum Finger {
     FINGER_MIDDLE = 0,  // middle + thumb - left click
     FINGER_RING,        // ring + thumb - right click
-    FINGER_PINKY,       // pinky + thumb - DPI cycle / tracking sleep
+    FINGER_PINKY,       // pinky + thumb - DPI toggle / tracking sleep
     FINGER_COUNT
 };
 

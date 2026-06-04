@@ -10,6 +10,7 @@
 #include "hid.h"
 #include "buzzer.h"
 #include "pointer.h"
+#include "mode.h"
 #include <protocol.h>
 
 // The BNO055 streams a few all-zero frames while its fusion warms up after
@@ -82,6 +83,19 @@ void setup()
     {
         Serial.println("calibration failed - restarting");
     }
+
+    modeBegin();
+}
+
+// Blocks in the square trace, then drops the machine back to TRACKING. Shared
+// by startup and the in-session recalibrate gesture.
+static void recalibrate()
+{
+    while (!pointerCalibrate())
+    {
+        Serial.println("recalibration failed - restarting");
+    }
+    modeAfterCalibration();
 }
 
 void loop()
@@ -96,8 +110,46 @@ void loop()
         return; // firmware built against a different protocol
     }
 
-    // Update buttons before the cursor so the click pin sees
-    // the current contact state on the same packet.
+    // Advance the gesture/mode machine on the live pinky+thumb contact.
+    ModeUpdate m = modeTick(packet.contacts & CONTACT_PINKY);
+
+    if (m.precisionToggled)
+    {
+        Serial.println(m.precision ? "slow mode on" : "slow mode off");
+        buzzerPrecision(m.precision);
+    }
+    if (m.enteredSleep)
+    {
+        Serial.println("tracking paused");
+        // Drop any held buttons so freeing the hand cannot leave one stuck
+        hidLeftButton(false);
+        hidRightButton(false);
+        buzzerSleep();
+    }
+    if (m.resumed)
+    {
+        Serial.println("tracking resumed");
+        pointerResetFilter(); // snap to where the hand points now no slew
+        buzzerWake();
+    }
+    if (m.recalibrate)
+    {
+        Serial.println("recalibrating");
+        recalibrate();
+        return; // the blocking trace consumed this packet
+    }
+
+    if (m.mode == MODE_SLEEPING)
+    {
+        // Tracking paused: hold the cursor still and ignore contacts
+        hidLeftButton(false);
+        hidRightButton(false);
+        return;
+    }
+
+    // TRACKING. Update buttons before the cursor so the click pin sees the
+    // current contact state on the same packet.
+    pointerSetPrecision(m.precision);
     ScreenPos p = pointerUpdate(packet.eulerX, packet.eulerY);
     hidLeftButton(packet.contacts & CONTACT_MIDDLE);
     hidRightButton(packet.contacts & CONTACT_RING);
