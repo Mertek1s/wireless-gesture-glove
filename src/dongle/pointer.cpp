@@ -14,6 +14,10 @@ static constexpr float ALPHA_MIN = 0.12f;
 static constexpr float ALPHA_MAX = 0.60f;
 static constexpr float ERR_REF_DEG = 6.0f;
 
+// Fraction of the screen a full hand sweep covers in precision mode. The
+// lower it is the finer the control and the bigger the sweep to cross the screen.
+static constexpr float PRECISION_SCALE = 0.4f;
+
 // A tap is rejected unless the last STABILITY_SAMPLES readings held steadier
 // than STABILITY_MAX_STD_DEG - i.e the hand was still when the corner was set.
 static constexpr uint8_t STABILITY_SAMPLES = 8;
@@ -69,6 +73,12 @@ static float gAp, gBp, gCp;
 static float gYawFilt = 0.0f;
 static float gRollFilt = 0.0f;
 static bool gHaveFilt = false;
+
+// precision (slow) mode: the unscaled screen position from the last update and
+// the anchor captured when precision was switched on.
+static bool gPrecision = false;
+static float gLastAbsX = 0.5f, gLastAbsY = 0.5f;
+static float gPrecAnchorX = 0.5f, gPrecAnchorY = 0.5f;
 
 // ---- Helpers -------------------------------------------------------------
 
@@ -257,7 +267,33 @@ void pointerBegin()
 {
     gCalibrated = false;
     gHaveFilt = false;
+    gPrecision = false;
     ringReset();
+}
+
+void pointerSetPrecision(bool on)
+{
+    if (on == gPrecision)
+    {
+        return;
+    }
+    gPrecision = on;
+    if (on)
+    {
+        // Anchor on the cursor's current spot so enabling it does not jump
+        gPrecAnchorX = gLastAbsX;
+        gPrecAnchorY = gLastAbsY;
+    }
+}
+
+bool pointerPrecision()
+{
+    return gPrecision;
+}
+
+void pointerResetFilter()
+{
+    gHaveFilt = false;
 }
 
 bool pointerCalibrated()
@@ -538,5 +574,18 @@ ScreenPos pointerUpdate(float yaw, float roll)
     v = clamp01(v);
 
     // v=0 is the bottom row; the host origin is top-left, so flip y
-    return ScreenPos{u, 1.0f - v};
+    float absX = u;
+    float absY = 1.0f - v;
+    gLastAbsX = absX;
+    gLastAbsY = absY;
+
+    if (gPrecision)
+    {
+        // shrink hand motion around the anchor for fine control
+        absX = gPrecAnchorX + PRECISION_SCALE * (absX - gPrecAnchorX);
+        absY = gPrecAnchorY + PRECISION_SCALE * (absY - gPrecAnchorY);
+        return ScreenPos{clamp01(absX), clamp01(absY)};
+    }
+
+    return ScreenPos{absX, absY};
 }

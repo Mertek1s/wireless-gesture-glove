@@ -56,3 +56,41 @@ void buzzerCalibrationDone()
     tone(BUZZER_PIN, 2500, 120);
     delay(140);
 }
+
+void buzzerPrecision(bool on)
+{
+    if (on)
+    {
+        tone(BUZZER_PIN, 1600, 60);
+        delay(70);
+        tone(BUZZER_PIN, 1100, 80);
+        delay(90);
+    }
+    else
+    {
+        tone(BUZZER_PIN, 1100, 60);
+        delay(70);
+        tone(BUZZER_PIN, 1600, 80);
+        delay(90);
+    }
+}
+
+void buzzerSleep()
+{
+    tone(BUZZER_PIN, 1400, 90);
+    delay(100);
+    tone(BUZZER_PIN, 1000, 90);
+    delay(100);
+    tone(BUZZER_PIN, 600, 140);
+    delay(160);
+}
+
+void buzzerWake()
+{
+    tone(BUZZER_PIN, 600, 90);
+    delay(100);
+    tone(BUZZER_PIN, 1000, 90);
+    delay(100);
+    tone(BUZZER_PIN, 1400, 140);
+    delay(160);
+}
