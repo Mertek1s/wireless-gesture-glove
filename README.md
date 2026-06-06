@@ -31,9 +31,10 @@ radio link:
 
 - Absolute "point where you want the cursor" control via a 9-axis IMU.
 - Left and right click from fingertip touches.
-- Adjustable sensitivity (DPI) presets.
-- Tracking pause/resume so you can rest your hand, with origin re-centring.
+- Slow (precision) pointer mode for fine control.
+- Tracking pause/resume so you can rest your hand.
 - Startup calibration that maps your comfortable hand range to the screen.
+- Audio cues for calibration steps, mode changes, and status.
 - Wireless battery-powered glove.
 
 ## Hardware
@@ -59,9 +60,10 @@ On power-up the glove asks for a one-time calibration: trace a rectangle with yo
 | Point with the index finger           | Move the cursor |
 | Middle fingertip to thumb             | Left click |
 | Ring fingertip to thumb               | Right click |
-| Pinky fingertip to thumb, single tap  | Cycle sensitivity (DPI) preset |
-| Pinky fingertip to thumb, hold ≥ 3s  | Pause tracking (free your hand) |
-| Pinky single tap while paused         | Resume and re-centre the cursor origin |
+| Pinky fingertip to thumb, single tap  | Toggle slow (precision) mode |
+| Pinky fingertip to thumb, hold ≥ 1.5s | Pause tracking (free your hand) |
+| Pinky single tap while paused         | Resume tracking |
+| Pinky hold ≥ 3s while paused          | Recalibrate |
 
 ## Repository layout
 
