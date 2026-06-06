@@ -16,6 +16,7 @@ communicate over a 2.4 GHz nRF24L01 radio link.
 | Decoupling      | 47 µF capacitor                                               | Across the nRF24 VCC/GND for supply stability |
 | Battery         | 3.7 V 1200 mAh LiPo (4.4 Wh)                                  | Untethered power |
 | Power board     | DC-DC boost converter, 3.7 V -> 5 V 2 A, USB-C charge/discharge | Battery charging + regulated 5 V rail |
+| Power switch    | 2-position rocker switch (SPST)                               | 5 V rail from the booster to the ESP32 - device on/off |
 
 ### Dongle
 
@@ -26,6 +27,7 @@ communicate over a 2.4 GHz nRF24L01 radio link.
 | Radio adapter   | Haitronic 8-pin socket adapter for wireless transceiver   | Accepts 5 V, supplies a regulated 3.3 V to the nRF24 |
 | Decoupling      | 47 µF capacitor                                           | Across the nRF24 VCC/GND for supply stability |
 | Host link       | USB cable to PC                                           | Power and HID data |
+| Buzzer          | Passive piezo buzzer                                      | Audio cues (status, calibration, modes) |
 
 ## Schematics
 
